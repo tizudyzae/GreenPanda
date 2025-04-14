@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Shop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #f7faf7;
+      --text: #1f2937;
+      --card: #f3f9f3;
+      --brand: #71B069;
+      --brand-hover: #5e9557;
+      --brand-light: #ebf5eb;
+      --accent-dark: #594324;
+	  --vh: 100vh;
+    }
+
+    [data-theme="dark"] {
+      --bg: #71B069;
+      --text: #ffffff;
+      --card: #71B069;
+      --brand: #ffffff;
+      --brand-hover: #f4f4f4;
+      --brand-light: #ffffff30;
+    }
+
+    body {
+      font-family: 'Libre Baskerville', serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+	
+	body.freeze-scroll {
+  overflow: hidden;
+  height: 100%;
+}
+
+
+    .text-brand     { color: var(--brand); }
+    .bg-brand       { background-color: var(--brand); }
+    .bg-brand-light { background-color: var(--brand-light); }
+    .hover-brand:hover { background-color: var(--brand-hover); }
+    .border-brand   { border-color: var(--brand); }
+    .bg-card        { background-color: var(--card); }
+    .text-accent-dark { color: var(--accent-dark); }
+
+    [data-theme="dark"] header {
+      background-color: #71B069 !important;
+      border-color: #594324 !important;
+    }
+
+    .add-button {
+      background-color: var(--brand);
+      color: white;
+    }
+
+    [data-theme="dark"] .add-button {
+      background-color: white;
+      color: black;
+    }
+	#detailPanel {
+  height: calc(var(--vh, 1vh) * 100);
+}
+  </style>
+</head>
+<body class="overflow-x-hidden transition-colors duration-300">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-card border-b-4 border-[#594324]">
+  <div class="relative flex items-center justify-between h-[6.5rem] px-4">
+
+    <!-- Logo: Centered Absolutely -->
+    <div class="absolute left-1/2 transform -translate-x-1/2">
+      <img src="logo.svg" class="h-[6rem] block dark:hidden" alt="Logo Light" />
+      <img src="LOGO.svg" class="h-[6rem] hidden dark:block" alt="Logo Dark" />
+    </div>
+
+    <!-- Right: Theme toggle + Cart -->
+    <div class="flex items-center gap-4 ml-auto">
+      <button id="toggleTheme" class="w-8 h-8" title="Toggle Theme">
+        <span id="iconContainer" class="block"></span>
+      </button>
+      <button class="relative group" title="View Cart">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="w-6 h-6 stroke-current text-black dark:text-white"
+             fill="none" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4
+                   M7 13L5.4 5H3
+                   M7 13l-1.2 6h11.4
+                   M10 21a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2z" />
+        </svg>
+        <span id="cartTotal" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">0</span>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+
+
+
+
+  <!-- Category Navigation (Sticky) -->
+  <nav class="sticky top-[6.5rem] z-40 bg-card p-2 flex gap-4 text-sm font-semibold border-b border-gray-200" id="categoryNav">
+  <a href="#" data-category="HairCare" class="text-brand hover:underline">Hair Care</a>
+  <a href="#" data-category="SkinCare" class="text-brand hover:underline">Skin Care</a>
+  <a href="#" data-category="Accessories" class="text-brand hover:underline">Accessories</a>
+  <a href="#" data-category="Bundles" class="text-brand hover:underline">Bundles</a>
+</nav>
+
+
+  <!-- Main Content -->
+  <main class="p-4 space-y-12">
+    <section id="HairCare">
+      <h3 class="text-2xl font-semibold mb-4 border-b-2 border-brand text-accent-dark inline-block">Hair Care</h3>
+      <div class="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5" id="freshGrid"></div>
+    </section>
+    <section id="SkinCare">
+      <h3 class="text-2xl font-semibold mb-4 border-b-2 border-brand text-accent-dark inline-block">Skin Care</h3>
+      <div class="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5" id="pantryGrid"></div>
+    </section>
+    <section id="Accessories">
+      <h3 class="text-2xl font-semibold mb-4 border-b-2 border-brand text-accent-dark inline-block">Accessories</h3>
+      <div class="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5" id="drinksGrid"></div>
+    </section>
+    <section id="Bundles">
+      <h3 class="text-2xl font-semibold mb-4 border-b-2 border-brand text-accent-dark inline-block">Bundles</h3>
+      <div class="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5" id="householdGrid"></div>
+    </section>
+  </main>
+
+  <!-- Overlay and Slide-Out Panel -->
+  <div id="overlay" class="fixed inset-0 bg-black bg-opacity-40 hidden z-40"></div>
+  <div id="detailPanel" class="fixed top-[6.5rem] right-0 w-full sm:w-[400px] h-full bg-card z-50 shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+    <button id="closePanel" class="absolute top-3 right-4 text-2xl font-bold text-gray-700 dark:text-white">&times;</button>
+    <div class="p-6 mt-10">
+      <img id="detailImage" src="" class="w-full h-auto mb-4 rounded" />
+      <h3 id="detailTitle" class="text-2xl font-bold text-accent-dark mb-2"></h3>
+      <p id="detailPrice" class="text-gray-700 dark:text-white text-lg mb-4"></p>
+      <div class="flex items-center gap-3 mb-4">
+        <button id="panelTrolley" class="trolley-button" title="Increase Quantity">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current text-black dark:text-white" fill="none" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5H3M7 13l-1.2 6h11.4M10 21a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2z"/>
+          </svg>
+        </button>
+        <span id="panelQty" class="text-sm text-brand font-semibold">x1</span>
+        <button id="panelAddBtn" class="add-button px-3 py-1 rounded text-sm">Add to Cart</button>
+      </div>
+      <div class="space-y-4 text-sm text-gray-600 dark:text-white">
+  <p>This is a sample product description. Add your own info here.</p>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed feugiat urna non lorem porttitor, non rhoncus leo lacinia.</p>
+  <p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Integer hendrerit velit non odio tincidunt, vitae pharetra nulla hendrerit.</p>
+  <p>Aliquam erat volutpat. Donec tincidunt facilisis velit, sed fermentum nulla hendrerit a.</p>
+  <p>Ut faucibus nisi et nisl posuere, et dictum nisi ullamcorper.</p>
+  <p>Sed sit amet velit justo. Pellentesque id leo nec justo mattis convallis non at velit.</p>
+  <p>Suspendisse potenti. Quisque eu felis sed nulla laoreet fermentum.</p>
+  <p>Mauris id lorem nec nulla euismod placerat. Etiam in augue feugiat, volutpat nunc at, fermentum erat.</p>
+  <p>Fusce convallis sapien id velit porttitor, sed semper eros tincidunt.</p>
+  <p>Nam fermentum mauris nec felis eleifend iaculis.</p>
+</div>
+
+    </div>
+  </div>
+
+  <!-- Script Section -->
+  <script>
+  const html = document.documentElement;
+
+  function setViewportHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }
+  window.addEventListener('resize', setViewportHeight);
+  window.addEventListener('orientationchange', setViewportHeight);
+  setViewportHeight();
+
+  const toggleTheme = document.getElementById('toggleTheme');
+  const iconContainer = document.getElementById('iconContainer');
+  const cartTotalEl = document.getElementById('cartTotal');
+  const overlay = document.getElementById('overlay');
+  const panel = document.getElementById('detailPanel');
+  const closePanel = document.getElementById('closePanel');
+  const detailImage = document.getElementById('detailImage');
+  const detailTitle = document.getElementById('detailTitle');
+  const detailPrice = document.getElementById('detailPrice');
+  const panelQty = document.getElementById('panelQty');
+  const panelTrolley = document.getElementById('panelTrolley');
+  const panelAddBtn = document.getElementById('panelAddBtn');
+
+  let cart = JSON.parse(localStorage.getItem('cart')) || {};
+  let selectedProduct = null;
+  let panelQuantity = 1;
+  const qtyMap = {};
+
+  const categories = {
+    fresh: ['Carrots', 'Broccoli', 'Lettuce', 'Tomatoes', 'Apples'],
+    pantry: ['Pasta', 'Rice', 'Beans', 'Cereal', 'Flour'],
+    drinks: ['Orange Juice', 'Cola', 'Coffee', 'Tea', 'Water'],
+    household: ['Dish Soap', 'Toilet Paper', 'Detergent', 'Sponges', 'Trash Bags']
+  };
+
+  function generateProducts(nameArray, category) {
+    return nameArray.map((name, index) => ({
+      id: `${category}-${index}`,
+      title: name,
+      price: (Math.random() * 10 + 1).toFixed(2),
+      image: `https://picsum.photos/seed/${category}-${index}/300`,
+      category
+    }));
+  }
+
+  const categoryLinks = document.querySelectorAll('#categoryNav a');
+  const sections = document.querySelectorAll('main section');
+
+  sections.forEach((section, index) => {
+    section.style.display = index === 0 ? 'block' : 'none';
+  });
+
+  categoryLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const category = link.dataset.category;
+      sections.forEach(section => {
+        section.style.display = section.id === category ? 'block' : 'none';
+      });
+    });
+  });
+
+  function renderAllProducts() {
+    for (const category in categories) {
+      const grid = document.getElementById(`${category}Grid`);
+      const products = generateProducts(categories[category], category);
+
+      products.forEach(product => {
+        qtyMap[product.id] = 1;
+
+        const card = document.createElement('div');
+        card.className = "bg-card p-4 rounded-lg shadow hover:shadow-md transition-colors";
+        card.innerHTML = `
+          <img src="${product.image}" alt="${product.title}" class="w-full h-auto mb-2 rounded cursor-pointer"/>
+          <h3 class="font-semibold text-lg text-accent-dark">${product.title}</h3>
+          <p class="text-sm text-gray-600 mb-2">$${product.price}</p>
+          <div class="flex items-center space-x-2">
+            <button class="product-trolley" data-id="${product.id}">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current text-black dark:text-white" fill="none" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5H3M7 13l-1.2 6h11.4M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2M16 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
+              </svg>
+            </button>
+            <span class="product-qty text-sm text-brand font-semibold" id="qty-${product.id}">x1</span>
+            <button class="product-add add-button px-2 py-1 rounded text-sm" data-id="${product.id}">Add</button>
+          </div>
+        `;
+
+        card.querySelector('img').addEventListener('click', () => openPanel(product));
+        grid.appendChild(card);
+      });
+    }
+  }
+
+  function openPanel(product) {
+    selectedProduct = product;
+    panelQuantity = qtyMap[product.id] || 1;
+    detailImage.src = product.image;
+    detailTitle.textContent = product.title;
+    detailPrice.textContent = `$${product.price}`;
+    panelQty.textContent = `x${panelQuantity}`;
+    overlay.classList.remove('hidden');
+    panel.classList.remove('translate-x-full');
+    document.body.classList.add('freeze-scroll');
+  }
+
+  closePanel.addEventListener('click', () => {
+    overlay.classList.add('hidden');
+    panel.classList.add('translate-x-full');
+    document.body.classList.remove('freeze-scroll');
+  });
+
+  overlay.addEventListener('click', () => {
+    overlay.classList.add('hidden');
+    panel.classList.add('translate-x-full');
+  });
+
+  panelTrolley.addEventListener('click', () => {
+    panelQuantity++;
+    panelQty.textContent = `x${panelQuantity}`;
+  });
+
+  panelAddBtn.addEventListener('click', () => {
+    if (!selectedProduct) return;
+    const id = selectedProduct.id;
+    cart[id] = (cart[id] || 0) + panelQuantity;
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartDisplay();
+  });
+
+  function updateCartDisplay() {
+    const total = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+    cartTotalEl.textContent = total;
+  }
+
+const lightIcon = `
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 fill-current text-yellow-400" viewBox="0 0 24 24">
+    <path d="M9 21h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1zm3-19a7 7 0 0 0-7 7c0 2.76 1.64 5.13 4 6.16V17a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1.84c2.36-1.03 4-3.4 4-6.16a7 7 0 0 0-7-7z"/>
+  </svg>`;
+
+
+const darkIcon = `
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 fill-current text-white" viewBox="0 0 24 24">
+    <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 0010.12 9.79z"/>
+  </svg>
+`;
+
+  
+  
+  function updateThemeIcon() {
+    const current = html.getAttribute('data-theme');
+    iconContainer.innerHTML = current === 'dark' ? darkIcon : lightIcon;
+  }
+
+  toggleTheme?.addEventListener('click', () => {
+    const current = html.getAttribute('data-theme') || 'light';
+    html.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+    updateThemeIcon();
+  });
+
+  document.addEventListener('click', e => {
+    if (e.target.closest('.product-trolley')) {
+      const id = e.target.closest('.product-trolley').dataset.id;
+      qtyMap[id]++;
+      document.getElementById(`qty-${id}`).textContent = `x${qtyMap[id]}`;
+    }
+
+    if (e.target.closest('.product-add')) {
+      const id = e.target.closest('.product-add').dataset.id;
+      cart[id] = (cart[id] || 0) + qtyMap[id];
+      localStorage.setItem('cart', JSON.stringify(cart));
+      qtyMap[id] = 1;
+      document.getElementById(`qty-${id}`).textContent = `x1`;
+      updateCartDisplay();
+    }
+  });
+
+  // ✅ Image Modal Zoom Setup
+  document.addEventListener('DOMContentLoaded', () => {
+    const detailImage = document.getElementById('detailImage');
+    const imageModal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const closeImageModal = document.getElementById('closeImageModal');
+
+    if (detailImage && imageModal && modalImage && closeImageModal) {
+      detailImage.addEventListener('click', () => {
+        modalImage.src = detailImage.src;
+        imageModal.classList.remove('hidden');
+      });
+
+      closeImageModal.addEventListener('click', () => {
+        imageModal.classList.add('hidden');
+      });
+
+      imageModal.addEventListener('click', (e) => {
+        if (e.target === imageModal) {
+          imageModal.classList.add('hidden');
+        }
+      });
+
+      document.querySelectorAll('.thumb').forEach(thumb => {
+        thumb.addEventListener('click', () => {
+          modalImage.src = thumb.src;
+        });
+      });
+
+      // Hammer.js pinch zoom
+      const hammer = new Hammer.Manager(modalImage);
+      const pinch = new Hammer.Pinch();
+      const doubleTap = new Hammer.Tap({ event: 'doubletap', taps: 2 });
+      hammer.add([pinch, doubleTap]);
+
+      let scale = 1;
+      let lastScale = 1;
+
+      hammer.on("pinchstart", () => lastScale = scale);
+      hammer.on("pinchmove", ev => {
+        scale = Math.max(1, Math.min(3, lastScale * ev.scale));
+        modalImage.style.transform = `scale(${scale})`;
+      });
+      hammer.on("pinchend", () => lastScale = scale);
+
+      hammer.on("doubletap", () => {
+        scale = 1;
+        modalImage.style.transform = "scale(1)";
+      });
+    }
+  });
+
+  renderAllProducts();
+  updateThemeIcon();
+  updateCartDisplay();
+</script>
+
+  
+<!-- Image Modal Viewer -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[100] hidden">
+  <div class="relative max-w-full max-h-full p-4 bg-white dark:bg-[#333] rounded shadow-lg">
+    <button id="closeImageModal" class="absolute top-2 right-2 text-white bg-black bg-opacity-60 rounded-full w-8 h-8 flex items-center justify-center z-10">
+      &times;
+    </button>
+    <img
+  id="modalImage"
+  src=""
+  alt="Zoomed Product"
+  class="h-[60vh] w-auto max-w-full object-contain mx-auto transition-transform duration-300 hover:scale-105"
+  style="touch-action: none; transform-origin: center;"
+/>
+
+    <div class="flex mt-4 gap-2 justify-center">
+      <img src="https://picsum.photos/seed/alt1/100" class="thumb w-16 h-16 rounded cursor-pointer object-cover" />
+      <img src="https://picsum.photos/seed/alt2/100" class="thumb w-16 h-16 rounded cursor-pointer object-cover" />
+      <img src="https://picsum.photos/seed/alt3/100" class="thumb w-16 h-16 rounded cursor-pointer object-cover" />
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
