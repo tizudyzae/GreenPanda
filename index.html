@@ -1,20 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-	<script>
-  tailwind.config = {
-    darkMode: 'class'
-  }
-</script>
-<script src="https://cdn.tailwindcss.com"></script>
-	
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
   <title>My Shop</title>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
-  
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
   
   html, body {
@@ -92,7 +85,7 @@
       <!-- Logo -->
       <div class="absolute left-1/2 transform -translate-x-1/2">
         <img src="logo.svg" class="h-[6rem] block dark:hidden" alt="Logo Light" />
-        <img src="logo.svg" class="h-[6rem] hidden dark:block" alt="Logo Dark" />
+        <img src="LOGO.svg" class="h-[6rem] hidden dark:block" alt="Logo Dark" />
       </div>
 
       <!-- Right: Theme toggle + Cart -->
@@ -364,13 +357,10 @@ const darkIcon = `
   }
 
   toggleTheme?.addEventListener('click', () => {
-  const current = html.getAttribute('data-theme') || 'light';
-  const newTheme = current === 'light' ? 'dark' : 'light';
-  html.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme); // Save to localStorage
-  updateThemeIcon();
-});
-
+    const current = html.getAttribute('data-theme') || 'light';
+    html.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+    updateThemeIcon();
+  });
 
   document.addEventListener('click', e => {
     if (e.target.closest('.product-trolley')) {
@@ -391,13 +381,6 @@ const darkIcon = `
 
   // ✅ Image Modal Zoom Setup
   document.addEventListener('DOMContentLoaded', () => {
-const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) {
-    html.setAttribute('data-theme', savedTheme);
-  }
-  updateThemeIcon();
-  renderAllProducts();
-  updateCartDisplay();
     const detailImage = document.getElementById('detailImage');
     const imageModal = document.getElementById('imageModal');
     const modalImage = document.getElementById('modalImage');
