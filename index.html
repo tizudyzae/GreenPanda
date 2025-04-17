@@ -16,6 +16,23 @@
 	<script src="https://cdn.tailwindcss.com"></script>
   <style>
   
+  .send-button {
+  background-color: var(--brand);
+  color: white;
+}
+
+[data-theme="dark"] .send-button {
+  background-color: #5e9557; /* darker green for dark mode */
+  color: white;              /* ensures text stays visible */
+}
+  
+  .bg-brand {
+  background-color: var(--brand);
+}
+.hover\:bg-brand-hover:hover {
+  background-color: var(--brand-hover);
+}
+  
   html, body {
   touch-action: manipulation;
   -ms-touch-action: manipulation;
@@ -35,13 +52,13 @@
     }
 
     [data-theme="dark"] {
-      --bg: #71B069;
-      --text: #ffffff;
-      --card: #71B069;
-      --brand: #ffffff;
-      --brand-hover: #f4f4f4;
-      --brand-light: #ffffff30;
-    }
+  --bg: #71B069;
+  --text: #ffffff;
+  --card: #71B069;
+  --brand: #ffffff;         /* ❌ Currently set to white */
+  --brand-hover: #f4f4f4;
+  --brand-light: #ffffff30;
+}
 
     body {
       font-family: 'Libre Baskerville', serif;
@@ -87,41 +104,46 @@
 
   <!-- Header -->
   <header class="sticky top-0 z-50 bg-card border-b-4 border-[#594324]">
-    <div class="relative flex items-center justify-between h-[6.5rem] px-4">
-      <!-- Logo -->
-      <div class="absolute left-1/2 transform -translate-x-1/2">
-        <img src="logo.svg" class="h-[6rem] block dark:hidden" alt="Logo Light" />
-        <img src="logo.svg" class="h-[6rem] hidden dark:block" alt="Logo Dark" />
-      </div>
-
-      <!-- Right: Theme toggle + Cart -->
-      <div class="flex items-center gap-4 ml-auto">
-	      <!-- Contact Icon -->
-<button id="openContactModal" class="w-6 h-6" title="Contact Us">
-  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l9 6 9-6M21 8v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8m18 0L12 14 3 8" />
-  </svg>
-</button>
-
-        <button id="toggleTheme" class="w-8 h-8" title="Toggle Theme">
-          <span id="iconContainer" class="block"></span>
-        </button>
-        <button class="relative group" title="View Cart">
-          <svg xmlns="http://www.w3.org/2000/svg"
-               class="w-6 h-6 stroke-current text-black dark:text-white"
-               fill="none" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4
-                     M7 13L5.4 5H3
-                     M7 13l-1.2 6h11.4
-                     M10 21a1 1 0 100-2 1 1 0 000 2
-                     M16 21a1 1 0 100-2 1 1 0 000 2" />
-          </svg>
-          <span id="cartTotal" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">0</span>
-        </button>
-      </div>
+  <div class="relative flex items-center justify-between h-[6.5rem] px-4">
+    
+    <!-- Left: Envelope Icon -->
+    <div class="flex items-center gap-4">
+      <button id="openContactModal" class="w-6 h-6" title="Contact Us">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16c1.1 0 2 .9 2 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6c0-1.1.9-2 2-2z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M22 6l-10 7L2 6" />
+        </svg>
+      </button>
     </div>
-  </header>
+
+    <!-- Center: Logo -->
+    <div class="absolute left-1/2 transform -translate-x-1/2">
+      <img src="logo.svg" class="h-[6rem] block dark:hidden" alt="Logo Light" />
+      <img src="logo.svg" class="h-[6rem] hidden dark:block" alt="Logo Dark" />
+    </div>
+
+    <!-- Right: Theme toggle + Cart -->
+    <div class="flex items-center gap-4 ml-auto">
+      <button id="toggleTheme" class="w-8 h-8" title="Toggle Theme">
+        <span id="iconContainer" class="block"></span>
+      </button>
+      <button class="relative group" title="View Cart">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="w-6 h-6 stroke-current text-black dark:text-white"
+             fill="none" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4
+                   M7 13L5.4 5H3
+                   M7 13l-1.2 6h11.4
+                   M10 21a1 1 0 100-2 1 1 0 000 2
+                   M16 21a1 1 0 100-2 1 1 0 000 2" />
+        </svg>
+        <span id="cartTotal" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
 
   <!-- Category Navigation -->
   <nav class="sticky top-[6.5rem] z-40 bg-card p-2 flex gap-4 text-sm font-semibold border-b border-gray-200" id="categoryNav">
@@ -466,23 +488,27 @@ document.addEventListener('gestureend', function (e) {
 });
 
 	  // Contact Modal Logic
-const contactModal = document.getElementById('contactModal');
-const openContactBtn = document.getElementById('openContactModal');
-const closeContactBtn = document.getElementById('closeContactModal');
+document.addEventListener('DOMContentLoaded', function () {
+  const contactModal = document.getElementById('contactModal');
+  const openContactBtn = document.getElementById('openContactModal');
+  const closeContactBtn = document.getElementById('closeContactModal');
 
-openContactBtn?.addEventListener('click', () => {
-  contactModal.classList.remove('hidden');
-});
+  openContactBtn?.addEventListener('click', () => {
+    contactModal.classList.remove('hidden');
+  });
 
-closeContactBtn?.addEventListener('click', () => {
-  contactModal.classList.add('hidden');
-});
-
-contactModal?.addEventListener('click', (e) => {
-  if (e.target === contactModal) {
+  closeContactBtn?.addEventListener('click', () => {
     contactModal.classList.add('hidden');
-  }
+  });
+
+  contactModal?.addEventListener('click', (e) => {
+    if (e.target === contactModal) {
+      contactModal.classList.add('hidden');
+    }
+  });
 });
+
+
 
   
 </script>
@@ -511,33 +537,47 @@ contactModal?.addEventListener('click', (e) => {
 </div>
 
 	<!-- Contact Modal -->
-<div id="contactModal" class="fixed inset-0 z-[100] bg-black bg-opacity-50 hidden flex items-center justify-center">
-  <div class="bg-white dark:bg-card p-6 rounded-lg shadow-xl w-full max-w-lg relative">
-    <button id="closeContactModal" class="absolute top-2 right-4 text-xl font-bold text-black">&times;</button>
-    <p class="mb-4 text-accent-dark dark:text-white font-semibold">
-      Interested in working together? Fill out some info and we'll be in touch shortly. We can’t wait to hear from you!
+<!-- Contact Modal -->
+<div id="contactModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
+  <div class="bg-white dark:bg-[#333] rounded-lg max-w-md w-full p-6 relative">
+    <button id="closeContactModal" class="absolute top-2 right-2 text-2xl font-bold text-gray-700 dark:text-white">&times;</button>
+    
+    <p class="mb-4 text-sm text-gray-700 dark:text-gray-100">
+      Interested in working together? Fill out some info and we will be in touch shortly. We can’t wait to hear from you!
     </p>
-    <form id="contactForm" class="space-y-4">
+    
+    <form class="space-y-4">
       <div>
-        <label class="block text-sm text-accent-dark dark:text-white">First Name</label>
-        <input type="text" class="w-full p-2 border border-gray-300 rounded dark:bg-white dark:text-black" />
+        <label class="block text-sm text-gray-700 dark:text-white mb-1" for="firstName">First Name</label>
+        <input type="text" id="firstName" class="w-full border px-3 py-2 rounded bg-white dark:bg-[#444] dark:text-white" />
       </div>
+      
       <div>
-        <label class="block text-sm text-accent-dark dark:text-white">Last Name</label>
-        <input type="text" class="w-full p-2 border border-gray-300 rounded dark:bg-white dark:text-black" />
+        <label class="block text-sm text-gray-700 dark:text-white mb-1" for="lastName">Last Name</label>
+        <input type="text" id="lastName" class="w-full border px-3 py-2 rounded bg-white dark:bg-[#444] dark:text-white" />
       </div>
+      
       <div>
-        <label class="block text-sm text-accent-dark dark:text-white">Email (Required)</label>
-        <input type="email" required class="w-full p-2 border border-gray-300 rounded dark:bg-white dark:text-black" />
+        <label class="block text-sm text-gray-700 dark:text-white mb-1" for="email">Email (Required)</label>
+        <input type="email" id="email" required class="w-full border px-3 py-2 rounded bg-white dark:bg-[#444] dark:text-white" />
       </div>
+      
       <div>
-        <label class="block text-sm text-accent-dark dark:text-white">Message (Required)</label>
-        <textarea required class="w-full p-2 border border-gray-300 rounded dark:bg-white dark:text-black" rows="4"></textarea>
+        <label class="block text-sm text-gray-700 dark:text-white mb-1" for="message">Message (Required)</label>
+        <textarea id="message" required class="w-full border px-3 py-2 rounded bg-white dark:bg-[#444] dark:text-white"></textarea>
       </div>
-      <button type="submit" class="add-button px-4 py-2 rounded text-sm">Send</button>
+
+      <!-- ✅ Send Button -->
+      <div class="text-right">
+<button type="submit" class="mt-4 px-4 py-2 send-button rounded">
+  Send
+</button>
+      </div>
     </form>
   </div>
 </div>
+
+
 
 
 </body>
