@@ -7,7 +7,13 @@
   <title>My Shop</title>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+  tailwind.config = {
+    darkMode: 'class' // enables class-based dark mode
+  }
+</script>
+
+	<script src="https://cdn.tailwindcss.com"></script>
   <style>
   
   html, body {
@@ -184,6 +190,10 @@
   <script>
   const html = document.documentElement;
 
+	  const savedTheme = localStorage.getItem('theme') || 'light';
+html.setAttribute('data-theme', savedTheme);
+
+
   function setViewportHeight() {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -357,10 +367,13 @@ const darkIcon = `
   }
 
   toggleTheme?.addEventListener('click', () => {
-    const current = html.getAttribute('data-theme') || 'light';
-    html.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
-    updateThemeIcon();
-  });
+  const current = html.getAttribute('data-theme') || 'light';
+  const newTheme = current === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme); // ✅ Save manually toggled theme
+  updateThemeIcon();
+});
+
 
   document.addEventListener('click', e => {
     if (e.target.closest('.product-trolley')) {
