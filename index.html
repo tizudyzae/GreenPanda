@@ -96,6 +96,13 @@
 
       <!-- Right: Theme toggle + Cart -->
       <div class="flex items-center gap-4 ml-auto">
+	      <!-- Contact Icon -->
+<button id="openContactModal" class="w-6 h-6" title="Contact Us">
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l9 6 9-6M21 8v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8m18 0L12 14 3 8" />
+  </svg>
+</button>
+
         <button id="toggleTheme" class="w-8 h-8" title="Toggle Theme">
           <span id="iconContainer" class="block"></span>
         </button>
@@ -458,6 +465,25 @@ document.addEventListener('gestureend', function (e) {
   e.preventDefault();
 });
 
+	  // Contact Modal Logic
+const contactModal = document.getElementById('contactModal');
+const openContactBtn = document.getElementById('openContactModal');
+const closeContactBtn = document.getElementById('closeContactModal');
+
+openContactBtn?.addEventListener('click', () => {
+  contactModal.classList.remove('hidden');
+});
+
+closeContactBtn?.addEventListener('click', () => {
+  contactModal.classList.add('hidden');
+});
+
+contactModal?.addEventListener('click', (e) => {
+  if (e.target === contactModal) {
+    contactModal.classList.add('hidden');
+  }
+});
+
   
 </script>
 
@@ -481,6 +507,35 @@ document.addEventListener('gestureend', function (e) {
       <img src="https://picsum.photos/seed/alt2/100" class="thumb w-16 h-16 rounded cursor-pointer object-cover" />
       <img src="https://picsum.photos/seed/alt3/100" class="thumb w-16 h-16 rounded cursor-pointer object-cover" />
     </div>
+  </div>
+</div>
+
+	<!-- Contact Modal -->
+<div id="contactModal" class="fixed inset-0 z-[100] bg-black bg-opacity-50 hidden flex items-center justify-center">
+  <div class="bg-white dark:bg-card p-6 rounded-lg shadow-xl w-full max-w-lg relative">
+    <button id="closeContactModal" class="absolute top-2 right-4 text-xl font-bold text-black">&times;</button>
+    <p class="mb-4 text-accent-dark dark:text-white font-semibold">
+      Interested in working together? Fill out some info and we will be in touch shortly. We can’t wait to hear from you!
+    </p>
+    <form id="contactForm" class="space-y-4">
+      <div>
+        <label class="block text-sm text-accent-dark dark:text-white">First Name</label>
+        <input type="text" class="w-full p-2 border border-gray-300 rounded dark:bg-white dark:text-black" />
+      </div>
+      <div>
+        <label class="block text-sm text-accent-dark dark:text-white">Last Name</label>
+        <input type="text" class="w-full p-2 border border-gray-300 rounded dark:bg-white dark:text-black" />
+      </div>
+      <div>
+        <label class="block text-sm text-accent-dark dark:text-white">Email (Required)</label>
+        <input type="email" required class="w-full p-2 border border-gray-300 rounded dark:bg-white dark:text-black" />
+      </div>
+      <div>
+        <label class="block text-sm text-accent-dark dark:text-white">Message (Required)</label>
+        <textarea required class="w-full p-2 border border-gray-300 rounded dark:bg-white dark:text-black" rows="4"></textarea>
+      </div>
+      <button type="submit" class="add-button px-4 py-2 rounded text-sm">Send</button>
+    </form>
   </div>
 </div>
 
