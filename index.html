@@ -6,6 +6,7 @@
 
   <title>My Shop</title>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
   <script>
   tailwind.config = {
@@ -15,6 +16,18 @@
 
 	<script src="https://cdn.tailwindcss.com"></script>
   <style>
+  
+  
+  
+  #modalImage {
+  touch-action: pan-x pan-y; /* allow scroll & tap events outside Hammer scope */
+}
+
+  
+  [data-theme="dark"] #enterSite {
+  background-color: white;
+  color: black;
+}
   
   .send-button {
   background-color: var(--brand);
@@ -95,12 +108,32 @@
 
 
  #detailPanel {
-      height: calc(var(--vh, 1vh) * 100);
+  height: calc(var(--vh, 1vh) * 100);
+  padding-bottom: env(safe-area-inset-bottom, 16px); /* <-- Add this line */
+}
 
-    }
   </style>
 </head>
 <body class="overflow-x-hidden transition-colors duration-300">
+
+<!-- Splash Screen -->
+<div id="splashScreen" class="fixed inset-0 z-[1000] bg-card flex flex-col items-center justify-center">
+  <!-- Top-right Dark Mode Toggle (same as header) -->
+  <div class="absolute top-4 right-4">
+    <button id="splashToggleTheme" class="w-8 h-8" title="Toggle Theme">
+      <span id="splashIconContainer" class="block"></span>
+    </button>
+  </div>
+
+  <!-- Logo -->
+  <img src="logo.svg" alt="Logo" class="w-48 h-48 mb-8" />
+
+  <!-- Enter Button -->
+  <button id="enterSite" class="px-6 py-2 bg-brand text-white text-lg rounded hover:bg-brand-hover">
+    Enter
+  </button>
+</div>
+
 
   <!-- Header -->
   <header class="sticky top-0 z-50 bg-card border-b-4 border-[#594324]">
@@ -177,7 +210,11 @@
   <!-- Overlay and Slide-Out Panel -->
   <div id="overlay" class="fixed inset-0 bg-black bg-opacity-40 hidden z-40"></div>
   <div id="detailPanel" class="fixed top-[6.5rem] right-0 w-full sm:w-[400px] h-full bg-card z-50 shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
-    <button id="closePanel" class="absolute top-3 right-4 text-2xl font-bold text-gray-700 dark:text-white">&times;</button>
+    <button id="closePanel" class="absolute top-3 right-4 text-2xl font-bold text-gray-7<button id="closePanel"
+  class="absolute top-3 right-4 text-2xl font-bold text-gray-700 dark:text-white z-10">
+  &times;
+</button>
+
     <div class="p-6 w-full max-w-[600px] mx-auto">
 
       <img id="detailImage" src="" class="w-full h-auto mb-4 rounded" />
@@ -199,30 +236,23 @@
         <span id="panelQty" class="text-sm text-brand font-semibold">x1</span>
         <button id="panelAddBtn" class="add-button px-3 py-1 rounded text-sm">Add to Cart</button>
       </div>
-      <div class="product-description space-y-4 text-sm text-gray-600 dark:text-white">
-  <p>This is a sample product description. Add your own info here.</p>
-  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed feugiat urna non lorem porttitor, non rhoncus leo lacinia.</p>
-  <p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Integer hendrerit velit non odio tincidunt, vitae pharetra nulla hendrerit.</p>
-  <p>Aliquam erat volutpat. Donec tincidunt facilisis velit, sed fermentum nulla hendrerit a.</p>
-  <p>Ut faucibus nisi et nisl posuere, et dictum nisi ullamcorper.</p>
-  <p>Sed sit amet velit justo. Pellentesque id leo nec justo mattis convallis non at velit.</p>
-  <p>Suspendisse potenti. Quisque eu felis sed nulla laoreet fermentum.</p>
-  <p>Mauris id lorem nec nulla euismod placerat. Etiam in augue feugiat, volutpat nunc at, fermentum erat.</p>
-  <p>Fusce convallis sapien id velit porttitor, sed semper eros tincidunt.</p>
-  <p>Nam fermentum mauris nec felis eleifend iaculis.</p>
-</div>
+      <div id="detailDescription" class="product-description space-y-4 text-sm text-gray-600 dark:text-white"></div>
+<!-- Prevents text from being cut off on iOS Safari -->
+<div style="height: calc(env(safe-area-inset-bottom, 0px) + 80px);"></div>
+
+<div style="height: env(safe-area-inset-bottom, 100px);"></div>
 
     </div>
   </div>
 
   <!-- Script Section -->
-  <script>
+  
+<script>
   const html = document.documentElement;
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  html.setAttribute('data-theme', savedTheme);
 
-	  const savedTheme = localStorage.getItem('theme') || 'light';
-html.setAttribute('data-theme', savedTheme);
-
-
+  // Set viewport height custom property
   function setViewportHeight() {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -249,23 +279,6 @@ html.setAttribute('data-theme', savedTheme);
   let panelQuantity = 1;
   const qtyMap = {};
 
-  const categories = {
-    fresh: ['Carrots', 'Broccoli', 'Lettuce', 'Tomatoes', 'Apples'],
-    pantry: ['Pasta', 'Rice', 'Beans', 'Cereal', 'Flour'],
-    drinks: ['Orange Juice', 'Cola', 'Coffee', 'Tea', 'Water'],
-    household: ['Dish Soap', 'Toilet Paper', 'Detergent', 'Sponges', 'Trash Bags']
-  };
-
-  function generateProducts(nameArray, category) {
-    return nameArray.map((name, index) => ({
-      id: `${category}-${index}`,
-      title: name,
-      price: (Math.random() * 10 + 1).toFixed(2),
-      image: `https://picsum.photos/seed/${category}-${index}/300`,
-      category
-    }));
-  }
-
   const categoryLinks = document.querySelectorAll('#categoryNav a');
   const sections = document.querySelectorAll('main section');
 
@@ -283,60 +296,66 @@ html.setAttribute('data-theme', savedTheme);
     });
   });
 
-  function renderAllProducts() {
-    for (const category in categories) {
-      const grid = document.getElementById(`${category}Grid`);
-      const products = generateProducts(categories[category], category);
+  function renderAllProducts(productsData) {
+    const gridIds = {
+      HairCare: "freshGrid",
+      SkinCare: "pantryGrid",
+      Accessories: "drinksGrid",
+      Bundles: "householdGrid"
+    };
 
-      products.forEach(product => {
-        qtyMap[product.id] = 1;
+    productsData.forEach(product => {
+      const gridId = gridIds[product.category];
+      if (!gridId) return;
 
-        const card = document.createElement('div');
-        card.className = "bg-card p-4 rounded-lg shadow hover:shadow-md transition-colors";
-        card.innerHTML = `
-          <img src="${product.image}" alt="${product.title}" class="w-full h-auto mb-2 rounded cursor-pointer"/>
-          <h3 class="font-semibold text-lg text-accent-dark">${product.title}</h3>
-          <p class="text-sm text-gray-600 mb-2">£${product.price}</p>
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
 
-          <div class="flex items-center space-x-2">
-            <button class="product-trolley" data-id="${product.id}">
-              <span class="text-black dark:text-white">
-			  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke="currentColor"stroke-linecap="round" stroke-linejoin="round"
+      const card = document.createElement('div');
+      card.className = "bg-card p-4 rounded-lg shadow hover:shadow-md transition-colors";
+
+      card.innerHTML = `
+        <img src="${product.image_urls}" alt="${product.title}" class="w-full h-auto mb-2 rounded cursor-pointer"/>
+        <h3 class="font-semibold text-lg text-accent-dark">${product.title}</h3>
+        <p class="text-sm text-gray-600 mb-1">${product.price}</p>
+        <p class="text-xs text-gray-500 mb-2">${product.unit_price}</p>
+
+        <div class="flex items-center space-x-2">
+          <button class="product-trolley" data-id="${product.id}">
+            <span class="text-black dark:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5H3M7 13l-1.2 6h11.4M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2M16 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
               </svg>
-			  </span>
-            </button>
-            <span class="product-qty text-sm text-brand font-semibold" id="qty-${product.id}">x1</span>
-            <button class="product-add add-button px-2 py-1 rounded text-xs sm:text-sm whitespace-nowrap" data-id="...">
-  Add to Cart
-</button>
+            </span>
+          </button>
+          <span class="product-qty text-sm text-brand font-semibold" id="qty-${product.id}">x1</span>
+          <button class="product-add add-button px-2 py-1 rounded text-xs sm:text-sm whitespace-nowrap" data-id="${product.id}">
+            Add to Cart
+          </button>
+        </div>
+      `;
 
-
-          </div>
-        `;
-
-        card.addEventListener('click', (e) => {
-  // Prevent triggering panel if clicking on buttons
-  if (e.target.closest('.product-trolley') || e.target.closest('.product-add')) return;
-  openPanel(product);
-});
-
-        grid.appendChild(card);
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.product-trolley') || e.target.closest('.product-add')) return;
+        openPanel(product);
       });
-    }
+
+      grid.appendChild(card);
+    });
   }
 
   function openPanel(product) {
     selectedProduct = product;
     panelQuantity = qtyMap[product.id] || 1;
-    detailImage.src = product.image;
+    detailImage.src = product.image_urls;
     detailTitle.textContent = product.title;
-    detailPrice.textContent = `£${product.price}`;
+    detailPrice.textContent = `${product.price}`;
     panelQty.textContent = `x${panelQuantity}`;
     overlay.classList.remove('hidden');
     panel.classList.remove('translate-x-full');
     document.body.classList.add('freeze-scroll');
+    document.getElementById('detailDescription').innerHTML = `<p>${product.description}</p>`;
   }
 
   closePanel.addEventListener('click', () => {
@@ -356,64 +375,56 @@ html.setAttribute('data-theme', savedTheme);
   });
 
   panelAddBtn.addEventListener('click', () => {
-  if (!selectedProduct) return;
-  const id = selectedProduct.id;
-  cart[id] = (cart[id] || 0) + panelQuantity;
-  localStorage.setItem('cart', JSON.stringify(cart));
-  updateCartDisplay();
-
-  // Reset quantity to 1
-  panelQuantity = 1;
-  panelQty.textContent = `x${panelQuantity}`;
-});
-
+    if (!selectedProduct) return;
+    const id = selectedProduct.id;
+    cart[id] = (cart[id] || 0) + panelQuantity;
+    localStorage.setItem('cart', JSON.stringify(cart));
+    panelQuantity = 1;
+    panelQty.textContent = `x${panelQuantity}`;
+    updateCartDisplay();
+  });
 
   function updateCartDisplay() {
     const total = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
     cartTotalEl.textContent = total;
   }
 
-const lightIcon = `
-  <span class="text-black dark:text-white">
-  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 fill-current text-yellow-400" viewBox="0 0 24 24">
-    <path d="M9 21h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1zm3-19a7 7 0 0 0-7 7c0 2.76 1.64 5.13 4 6.16V17a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1.84c2.36-1.03 4-3.4 4-6.16a7 7 0 0 0-7-7z"/>
-  </svg></span>`;
+  const lightIcon = `<span class="text-black dark:text-white">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 fill-current text-yellow-400" viewBox="0 0 24 24">
+      <path d="M9 21h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1zm3-19a7 7 0 0 0-7 7c0 2.76 1.64 5.13 4 6.16V17a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1.84c2.36-1.03 4-3.4 4-6.16a7 7 0 0 0-7-7z"/>
+    </svg>
+  </span>`;
 
+  const darkIcon = `<span class="text-black dark:text-white">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 fill-current text-white" viewBox="0 0 24 24">
+      <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 0010.12 9.79z"/>
+    </svg>
+  </span>`;
 
-const darkIcon = `
-  <span class="text-black dark:text-white">
-  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 fill-current text-white" viewBox="0 0 24 24">
-    <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 0010.12 9.79z"/>
-  </svg>
-  </span>
-`;
-
-  
-  
   function updateThemeIcon() {
     const current = html.getAttribute('data-theme');
     iconContainer.innerHTML = current === 'dark' ? darkIcon : lightIcon;
   }
 
   toggleTheme?.addEventListener('click', () => {
-  const current = html.getAttribute('data-theme') || 'light';
-  const newTheme = current === 'light' ? 'dark' : 'light';
-  html.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme); // ✅ Save manually toggled theme
-  updateThemeIcon();
-});
+    const current = html.getAttribute('data-theme') || 'light';
+    const newTheme = current === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon();
+  });
 
-
+  // Cart + Qty click handlers
   document.addEventListener('click', e => {
     if (e.target.closest('.product-trolley')) {
       const id = e.target.closest('.product-trolley').dataset.id;
-      qtyMap[id]++;
+      qtyMap[id] = (qtyMap[id] || 1) + 1;
       document.getElementById(`qty-${id}`).textContent = `x${qtyMap[id]}`;
     }
 
     if (e.target.closest('.product-add')) {
       const id = e.target.closest('.product-add').dataset.id;
-      cart[id] = (cart[id] || 0) + qtyMap[id];
+      cart[id] = (cart[id] || 0) + (qtyMap[id] || 1);
       localStorage.setItem('cart', JSON.stringify(cart));
       qtyMap[id] = 1;
       document.getElementById(`qty-${id}`).textContent = `x1`;
@@ -421,7 +432,7 @@ const darkIcon = `
     }
   });
 
-  // ✅ Image Modal Zoom Setup
+  // Zoom modal with Hammer.js (pinch + pan allowed only inside modalImage)
   document.addEventListener('DOMContentLoaded', () => {
     const detailImage = document.getElementById('detailImage');
     const imageModal = document.getElementById('imageModal');
@@ -431,6 +442,7 @@ const darkIcon = `
     if (detailImage && imageModal && modalImage && closeImageModal) {
       detailImage.addEventListener('click', () => {
         modalImage.src = detailImage.src;
+        modalImage.style.transform = "scale(1) translate(0, 0)";
         imageModal.classList.remove('hidden');
       });
 
@@ -444,74 +456,116 @@ const darkIcon = `
         }
       });
 
-      document.querySelectorAll('.thumb').forEach(thumb => {
-        thumb.addEventListener('click', () => {
-          modalImage.src = thumb.src;
-        });
-      });
-
-      // Hammer.js pinch zoom
       const hammer = new Hammer.Manager(modalImage);
-      const pinch = new Hammer.Pinch();
-      const doubleTap = new Hammer.Tap({ event: 'doubletap', taps: 2 });
-      hammer.add([pinch, doubleTap]);
+      hammer.add([
+        new Hammer.Pinch(),
+        new Hammer.Pan({ direction: Hammer.DIRECTION_ALL, threshold: 0 }),
+        new Hammer.Tap({ event: 'doubletap', taps: 2 })
+      ]);
 
-      let scale = 1;
-      let lastScale = 1;
+      let scale = 1, lastScale = 1;
+      let posX = 0, posY = 0, lastPosX = 0, lastPosY = 0;
+
+      function updateTransform() {
+        modalImage.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+      }
 
       hammer.on("pinchstart", () => lastScale = scale);
       hammer.on("pinchmove", ev => {
         scale = Math.max(1, Math.min(3, lastScale * ev.scale));
-        modalImage.style.transform = `scale(${scale})`;
+        updateTransform();
       });
       hammer.on("pinchend", () => lastScale = scale);
 
+      hammer.on("panstart", () => {
+        lastPosX = posX;
+        lastPosY = posY;
+      });
+      hammer.on("panmove", ev => {
+        if (scale <= 1) return;
+        posX = lastPosX + ev.deltaX;
+        posY = lastPosY + ev.deltaY;
+        updateTransform();
+      });
+      hammer.on("panend", () => {
+        lastPosX = posX;
+        lastPosY = posY;
+      });
+
       hammer.on("doubletap", () => {
         scale = 1;
-        modalImage.style.transform = "scale(1)";
+        posX = 0;
+        posY = 0;
+        updateTransform();
       });
     }
   });
 
-  renderAllProducts();
-  updateThemeIcon();
-  updateCartDisplay();
-  
-  document.addEventListener('gesturestart', function (e) {
-  e.preventDefault();
-});
-document.addEventListener('gesturechange', function (e) {
-  e.preventDefault();
-});
-document.addEventListener('gestureend', function (e) {
-  e.preventDefault();
-});
+  // Contact Modal
+  document.addEventListener('DOMContentLoaded', function () {
+    const contactModal = document.getElementById('contactModal');
+    const openBtn = document.getElementById('openContactModal');
+    const closeBtn = document.getElementById('closeContactModal');
 
-	  // Contact Modal Logic
-document.addEventListener('DOMContentLoaded', function () {
-  const contactModal = document.getElementById('contactModal');
-  const openContactBtn = document.getElementById('openContactModal');
-  const closeContactBtn = document.getElementById('closeContactModal');
+    openBtn?.addEventListener('click', () => {
+      contactModal.classList.remove('hidden');
+    });
 
-  openContactBtn?.addEventListener('click', () => {
-    contactModal.classList.remove('hidden');
-  });
-
-  closeContactBtn?.addEventListener('click', () => {
-    contactModal.classList.add('hidden');
-  });
-
-  contactModal?.addEventListener('click', (e) => {
-    if (e.target === contactModal) {
+    closeBtn?.addEventListener('click', () => {
       contactModal.classList.add('hidden');
-    }
+    });
+
+    contactModal?.addEventListener('click', (e) => {
+      if (e.target === contactModal) {
+        contactModal.classList.add('hidden');
+      }
+    });
   });
-});
 
+  // Splash screen & theme toggle
+  window.addEventListener('load', () => {
+    const splash = document.getElementById('splashScreen');
+    const enterBtn = document.getElementById('enterSite');
+    const splashToggle = document.getElementById('splashToggleTheme');
+    const splashIconContainer = document.getElementById('splashIconContainer');
 
+    enterBtn?.addEventListener('click', () => {
+      splash.classList.add('hidden');
+    });
 
-  
+    splashToggle?.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const newTheme = current === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon();
+      splashIconContainer.innerHTML = newTheme === 'dark' ? darkIcon : lightIcon;
+    });
+
+    splashIconContainer.innerHTML = savedTheme === 'dark' ? darkIcon : lightIcon;
+  });
+
+  // Prevent zoom globally (except inside modal)
+  document.addEventListener('gesturestart', e => e.preventDefault());
+  document.addEventListener('gesturechange', e => e.preventDefault());
+  document.addEventListener('gestureend', e => e.preventDefault());
+
+  // Load CSV data
+  document.addEventListener('DOMContentLoaded', () => {
+    Papa.parse('products.csv', {
+      download: true,
+      header: true,
+      complete: function(results) {
+        const productsData = results.data;
+        renderAllProducts(productsData);
+        updateCartDisplay();
+        updateThemeIcon();
+      }
+    });
+  });
 </script>
+
+
 
   
 <!-- Image Modal Viewer -->
@@ -525,14 +579,10 @@ document.addEventListener('DOMContentLoaded', function () {
   src=""
   alt="Zoomed Product"
   class="h-[60vh] w-auto max-w-full object-contain mx-auto transition-transform duration-300 hover:scale-105"
-  style="touch-action: none; transform-origin: center;"
+  style="transform-origin: center;"
 />
 
-    <div class="flex mt-4 gap-2 justify-center">
-      <img src="https://picsum.photos/seed/alt1/100" class="thumb w-16 h-16 rounded cursor-pointer object-cover" />
-      <img src="https://picsum.photos/seed/alt2/100" class="thumb w-16 h-16 rounded cursor-pointer object-cover" />
-      <img src="https://picsum.photos/seed/alt3/100" class="thumb w-16 h-16 rounded cursor-pointer object-cover" />
-    </div>
+
   </div>
 </div>
 
