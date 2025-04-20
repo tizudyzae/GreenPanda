@@ -316,7 +316,11 @@
 
       card.innerHTML = `
         <img src="${product.image_urls}" alt="${product.title}" class="w-full h-auto mb-2 rounded cursor-pointer"/>
-        <h3 class="font-semibold text-lg text-accent-dark">${product.title}</h3>
+        <h3 class="font-semibold text-lg text-accent-dark">
+  ${product.title}
+  ${product.size ? `<span class="text-gray-700 dark:text-white text-sm"> (${product.size})</span>` : ''}
+</h3>
+
         <p class="text-sm text-gray-600 mb-1">${product.price}</p>
         <p class="text-xs text-gray-500 mb-2">${product.unit_price}</p>
 
@@ -346,17 +350,46 @@
   }
 
   function openPanel(product) {
-    selectedProduct = product;
-    panelQuantity = qtyMap[product.id] || 1;
-    detailImage.src = product.image_urls;
-    detailTitle.textContent = product.title;
-    detailPrice.textContent = `${product.price}`;
-    panelQty.textContent = `x${panelQuantity}`;
-    overlay.classList.remove('hidden');
-    panel.classList.remove('translate-x-full');
-    document.body.classList.add('freeze-scroll');
-    document.getElementById('detailDescription').innerHTML = `<p>${product.description}</p>`;
+  selectedProduct = product;
+  panelQuantity = qtyMap[product.id] || 1;
+  detailImage.src = product.image_urls;
+
+  // Title with size in price-style font
+  let titleHTML = product.title;
+  if (product.size) {
+    titleHTML += ` <span class="text-gray-700 dark:text-white text-lg">(${product.size})</span>`;
   }
+  detailTitle.innerHTML = titleHTML;
+
+  // Display price without adding extra £
+  detailPrice.textContent = product.price;
+
+  panelQty.textContent = `x${panelQuantity}`;
+  overlay.classList.remove('hidden');
+  panel.classList.remove('translate-x-full');
+  document.body.classList.add('freeze-scroll');
+
+  // Description
+  let descriptionHTML = `<p>${product.description}</p>`;
+
+  // Add "Ingredients" box if present
+  if (product.allergens && product.allergens.trim() !== "") {
+    descriptionHTML += `
+  <div class="mt-4 px-4 py-3 rounded border border-yellow-300 bg-yellow-50 text-gray-800 dark:border-green-600 dark:bg-[#2a3b2f]">
+    <strong class="block mb-1 text-accent-dark dark:text-white">Ingredients</strong>
+    <p class="text-sm leading-snug" style="color: #1f2937; darkreader-inline-color: #e8e6e3;" data-darkreader-inline-color>
+  ${product.allergens}
+</p>
+
+  </div>
+`;
+
+
+  }
+
+  document.getElementById('detailDescription').innerHTML = descriptionHTML;
+}
+
 
   closePanel.addEventListener('click', () => {
     overlay.classList.add('hidden');
@@ -383,6 +416,53 @@
     panelQty.textContent = `x${panelQuantity}`;
     updateCartDisplay();
   });
+  
+  const cartPanel = document.getElementById('cartPanel');
+const closeCartPanel = document.getElementById('closeCartPanel');
+const cartTableBody = document.getElementById('cartTableBody');
+
+// Open cart on basket click
+document.querySelector('button[title="View Cart"]')?.addEventListener('click', () => {
+  renderCartTable();
+  cartPanel.classList.remove('translate-y-full');
+});
+
+// Close cart panel
+closeCartPanel?.addEventListener('click', () => {
+  cartPanel.classList.add('translate-y-full');
+});
+
+// Render cart table
+function renderCartTable() {
+  cartTableBody.innerHTML = '';
+  let total = 0;
+
+  Object.entries(cart).forEach(([id, qty]) => {
+    const product = allProducts.find(p => p.id === id);
+    if (!product) return;
+
+    const unitPrice = parseFloat(product.price.replace(/[^\d.]/g, '')) || 0;
+    const lineTotal = unitPrice * qty;
+    total += lineTotal;
+
+    cartTableBody.innerHTML += `
+      <tr class="border-t border-gray-200 dark:border-gray-600">
+        <td class="py-2">${product.title}</td>
+        <td class="py-2 text-center">${qty}</td>
+        <td class="py-2 text-right">£${unitPrice.toFixed(2)}</td>
+        <td class="py-2 text-right font-semibold">£${lineTotal.toFixed(2)}</td>
+      </tr>
+    `;
+  });
+
+  cartTableBody.innerHTML += `
+    <tr class="border-t-2 border-gray-400 dark:border-gray-500 font-bold">
+      <td colspan="3" class="pt-3 text-right">Total</td>
+      <td class="pt-3 text-right">£${total.toFixed(2)}</td>
+    </tr>
+  `;
+}
+
 
   function updateCartDisplay() {
     const total = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
@@ -553,15 +633,16 @@
   // Load CSV data
   document.addEventListener('DOMContentLoaded', () => {
     Papa.parse('products.csv', {
-      download: true,
-      header: true,
-      complete: function(results) {
-        const productsData = results.data;
-        renderAllProducts(productsData);
-        updateCartDisplay();
-        updateThemeIcon();
-      }
-    });
+  download: true,
+  header: true,
+  complete: function(results) {
+    allProducts = results.data; // ✅ Save product list for use later
+    renderAllProducts(allProducts);
+    updateCartDisplay();
+    updateThemeIcon();
+  }
+});
+
   });
 </script>
 
@@ -627,6 +708,26 @@
   </div>
 </div>
 
+<!-- Cart Slide-Out Panel -->
+<div id="cartPanel" class="fixed bottom-0 left-0 w-full max-h-[60%] bg-white dark:bg-[#2a3b2f] shadow-lg z-50 transform translate-y-full transition-transform duration-300 ease-in-out overflow-y-auto">
+  <div class="p-4 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center">
+    <h3 class="text-lg font-bold text-accent-dark dark:text-white">Your Basket</h3>
+    <button id="closeCartPanel" class="text-xl font-bold text-gray-700 dark:text-white">&times;</button>
+  </div>
+  <div class="p-4">
+    <table class="w-full text-sm text-left text-gray-700 dark:text-gray-100">
+      <thead>
+        <tr class="border-b border-gray-300 dark:border-gray-600">
+          <th class="pb-2">Item</th>
+          <th class="pb-2 text-center">Qty</th>
+          <th class="pb-2 text-right">Unit</th>
+          <th class="pb-2 text-right">Total</th>
+        </tr>
+      </thead>
+      <tbody id="cartTableBody"></tbody>
+    </table>
+  </div>
+</div>
 
 
 
