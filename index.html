@@ -52,8 +52,12 @@
   overscroll-behavior: none;
 }
 
-  #viewCart svg { color: #000000; }
-  [data-theme="dark"] #viewCart svg { color: #000000; }
+  #viewCart svg path {
+  stroke: #000000;
+  }
+  [data-theme="dark"] #viewCart svg path {
+  stroke: #000000;
+  }
 
   
     :root {
@@ -226,7 +230,7 @@
         <svg xmlns="http://www.w3.org/2000/svg"
              class="w-6 h-6"
              fill="none" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+          <path stroke="#000" stroke-linecap="round" stroke-linejoin="round"
                 d="M3 3h2l.4 2M7 13h10l4-8H5.4
                    M7 13L5.4 5H3
                    M7 13l-1.2 6h11.4
@@ -284,16 +288,16 @@
       <p id="detailPrice" class="text-gray-700 dark:text-white text-lg mb-4"></p>
       <div class="flex items-center gap-3 mb-4">
         <button id="panelTrolley" class="trolley-button" title="Increase Quantity">
-         <span class="text-black dark:text-white">
-		 <svg xmlns="http://www.w3.org/2000/svg"
-     class="w-6 h-6 stroke-current"
+         <span>
+                 <svg xmlns="http://www.w3.org/2000/svg"
+     class="w-6 h-6"
      fill="none"
      stroke-width="2"
      viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            <path stroke="#000" stroke-linecap="round" stroke-linejoin="round"
               d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5H3M7 13l-1.2 6h11.4M10 21a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2z"/>
           </svg>
-		  </span>
+                  </span>
         </button>
         <span id="panelQty" class="text-sm text-brand font-semibold">x1</span>
         <button id="panelAddBtn" class="add-button px-3 py-1 rounded text-sm">Add to Cart</button>
@@ -389,9 +393,9 @@
 
         <div class="flex items-center space-x-2">
           <button class="product-trolley" data-id="${product.id}">
-            <span class="text-black dark:text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke="#000" stroke-linecap="round" stroke-linejoin="round"
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5H3M7 13l-1.2 6h11.4M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2M16 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
               </svg>
             </span>
