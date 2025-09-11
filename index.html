@@ -418,59 +418,57 @@
     updateCartDisplay();
   });
   
-  const viewCartBtn = document.getElementById('viewCart');
-  const cartPanel = document.getElementById('cartPanel');
-  const closeCartPanel = document.getElementById('closeCartPanel');
-  const cartTableBody = document.getElementById('cartTableBody');
+  document.addEventListener('DOMContentLoaded', () => {
+    const viewCartBtn = document.getElementById('viewCart');
+    const cartPanel = document.getElementById('cartPanel');
+    const closeCartPanel = document.getElementById('closeCartPanel');
+    const cartTableBody = document.getElementById('cartTableBody');
 
-  // Open cart on basket click
-  viewCartBtn?.addEventListener('click', () => {
-    renderCartTable();
-    cartPanel.classList.remove('hidden');
-  });
+    function renderCartTable() {
+      cartTableBody.innerHTML = '';
+      let total = 0;
 
-  // Close cart panel
-  closeCartPanel?.addEventListener('click', () => {
-    cartPanel.classList.add('hidden');
-  });
+      Object.entries(cart).forEach(([id, qty]) => {
+        const product = allProducts.find(p => p.id === id);
+        if (!product) return;
 
-  // Hide cart when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!cartPanel.contains(e.target) && !viewCartBtn.contains(e.target)) {
-      cartPanel.classList.add('hidden');
+        const unitPrice = parseFloat(product.price.replace(/[^\d.]/g, '')) || 0;
+        const lineTotal = unitPrice * qty;
+        total += lineTotal;
+
+        cartTableBody.innerHTML += `
+          <tr class="border-t border-gray-200 dark:border-gray-600">
+            <td class="py-2">${product.title}</td>
+            <td class="py-2 text-center">${qty}</td>
+            <td class="py-2 text-right">£${unitPrice.toFixed(2)}</td>
+            <td class="py-2 text-right font-semibold">£${lineTotal.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      cartTableBody.innerHTML += `
+        <tr class="border-t-2 border-gray-400 dark:border-gray-500 font-bold">
+          <td colspan="3" class="pt-3 text-right">Total</td>
+          <td class="pt-3 text-right">£${total.toFixed(2)}</td>
+        </tr>
+      `;
     }
+
+    viewCartBtn?.addEventListener('click', () => {
+      renderCartTable();
+      cartPanel.classList.remove('hidden');
+    });
+
+    closeCartPanel?.addEventListener('click', () => {
+      cartPanel.classList.add('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!cartPanel.contains(e.target) && !viewCartBtn.contains(e.target)) {
+        cartPanel.classList.add('hidden');
+      }
+    });
   });
-
-// Render cart table
-function renderCartTable() {
-  cartTableBody.innerHTML = '';
-  let total = 0;
-
-  Object.entries(cart).forEach(([id, qty]) => {
-    const product = allProducts.find(p => p.id === id);
-    if (!product) return;
-
-    const unitPrice = parseFloat(product.price.replace(/[^\d.]/g, '')) || 0;
-    const lineTotal = unitPrice * qty;
-    total += lineTotal;
-
-    cartTableBody.innerHTML += `
-      <tr class="border-t border-gray-200 dark:border-gray-600">
-        <td class="py-2">${product.title}</td>
-        <td class="py-2 text-center">${qty}</td>
-        <td class="py-2 text-right">£${unitPrice.toFixed(2)}</td>
-        <td class="py-2 text-right font-semibold">£${lineTotal.toFixed(2)}</td>
-      </tr>
-    `;
-  });
-
-  cartTableBody.innerHTML += `
-    <tr class="border-t-2 border-gray-400 dark:border-gray-500 font-bold">
-      <td colspan="3" class="pt-3 text-right">Total</td>
-      <td class="pt-3 text-right">£${total.toFixed(2)}</td>
-    </tr>
-  `;
-}
 
 
   function updateCartDisplay() {
