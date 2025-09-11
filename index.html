@@ -95,6 +95,10 @@
       border-color: var(--accent-dark) !important;
     }
 
+    [data-theme="dark"] #categoryNav a {
+      color: var(--accent-dark);
+    }
+
     .add-button {
       background-color: var(--brand);
       color: white;
@@ -424,6 +428,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     const viewCartBtn = document.getElementById('viewCart');
     const cartPanel = document.getElementById('cartPanel');
+    const cartOverlay = document.getElementById('cartOverlay');
     const closeCartPanel = document.getElementById('closeCartPanel');
     const cartTableBody = document.getElementById('cartTableBody');
     const clearCartBtn = document.getElementById('clearCart');
@@ -492,15 +497,18 @@
     viewCartBtn?.addEventListener('click', () => {
       renderCartTable();
       cartPanel.classList.remove('hidden');
+      cartOverlay.classList.remove('hidden');
     });
 
     closeCartPanel?.addEventListener('click', () => {
       cartPanel.classList.add('hidden');
+      cartOverlay.classList.add('hidden');
     });
 
     document.addEventListener('click', (e) => {
       if (!cartPanel.contains(e.target) && !viewCartBtn.contains(e.target)) {
         cartPanel.classList.add('hidden');
+        cartOverlay.classList.add('hidden');
       }
     });
 
@@ -758,11 +766,14 @@
 </button>
       </div>
     </form>
-  </div>
+</div>
 </div>
 
+<!-- Cart Overlay -->
+<div id="cartOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50"></div>
+
 <!-- Cart Card -->
-<div id="cartPanel" class="hidden fixed top-[6.5rem] right-4 w-96 max-h-[60%] bg-card shadow-lg rounded-lg z-50 overflow-y-auto">
+<div id="cartPanel" class="hidden fixed top-[6.5rem] right-4 w-96 max-h-[60%] bg-card shadow-lg rounded-lg z-[60] overflow-y-auto">
   <div class="p-4 border-b border-gray-300 flex justify-between items-center">
     <h3 class="text-lg font-bold text-black">Your Basket</h3>
     <button id="closeCartPanel" class="text-xl font-bold text-black">&times;</button>
