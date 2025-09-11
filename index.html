@@ -114,10 +114,28 @@
 }
 
 
- #detailPanel {
+#detailPanel {
   height: calc(var(--vh, 1vh) * 100);
   padding-bottom: env(safe-area-inset-bottom, 16px); /* <-- Add this line */
 }
+
+    .freeze-scroll {
+      overflow: hidden;
+    }
+
+    [data-theme="dark"] .product-qty,
+    [data-theme="dark"] #panelQty {
+      color: white;
+    }
+
+    [data-theme="dark"] #cartPanel {
+      background-color: white;
+    }
+
+    #cartPanel .qty-input {
+      background-color: var(--brand);
+      color: white;
+    }
 
   </style>
 </head>
@@ -408,6 +426,7 @@
   overlay.addEventListener('click', () => {
     overlay.classList.add('hidden');
     panel.classList.add('translate-x-full');
+    document.body.classList.remove('freeze-scroll');
   });
 
   panelTrolley.addEventListener('click', () => {
@@ -498,17 +517,20 @@
       renderCartTable();
       cartPanel.classList.remove('hidden');
       cartOverlay.classList.remove('hidden');
+      document.body.classList.add('freeze-scroll');
     });
 
     closeCartPanel?.addEventListener('click', () => {
       cartPanel.classList.add('hidden');
       cartOverlay.classList.add('hidden');
+      document.body.classList.remove('freeze-scroll');
     });
 
     document.addEventListener('click', (e) => {
       if (!cartPanel.contains(e.target) && !viewCartBtn.contains(e.target)) {
         cartPanel.classList.add('hidden');
         cartOverlay.classList.add('hidden');
+        document.body.classList.remove('freeze-scroll');
       }
     });
 
@@ -585,15 +607,18 @@
         modalImage.src = detailImage.src;
         modalImage.style.transform = "scale(1) translate(0, 0)";
         imageModal.classList.remove('hidden');
+        document.body.classList.add('freeze-scroll');
       });
 
       closeImageModal.addEventListener('click', () => {
         imageModal.classList.add('hidden');
+        document.body.classList.remove('freeze-scroll');
       });
 
       imageModal.addEventListener('click', (e) => {
         if (e.target === imageModal) {
           imageModal.classList.add('hidden');
+          document.body.classList.remove('freeze-scroll');
         }
       });
 
@@ -650,15 +675,18 @@
 
     openBtn?.addEventListener('click', () => {
       contactModal.classList.remove('hidden');
+      document.body.classList.add('freeze-scroll');
     });
 
     closeBtn?.addEventListener('click', () => {
       contactModal.classList.add('hidden');
+      document.body.classList.remove('freeze-scroll');
     });
 
     contactModal?.addEventListener('click', (e) => {
       if (e.target === contactModal) {
         contactModal.classList.add('hidden');
+        document.body.classList.remove('freeze-scroll');
       }
     });
   });
@@ -773,7 +801,7 @@
 <div id="cartOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50"></div>
 
 <!-- Cart Card -->
-<div id="cartPanel" class="hidden fixed top-[6.5rem] right-4 w-96 max-h-[60%] bg-card shadow-lg rounded-lg z-[60] overflow-y-auto">
+<div id="cartPanel" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 max-h-[60%] bg-card shadow-lg rounded-lg z-[60] overflow-y-auto">
   <div class="p-4 border-b border-gray-300 flex justify-between items-center">
     <h3 class="text-lg font-bold text-black">Your Basket</h3>
     <button id="closeCartPanel" class="text-xl font-bold text-black">&times;</button>
