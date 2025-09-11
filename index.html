@@ -52,6 +52,9 @@
   overscroll-behavior: none;
 }
 
+  #viewCart svg { color: #000000; }
+  [data-theme="dark"] #viewCart svg { color: #ffffff; }
+
   
     :root {
       --bg: #f7faf7;
@@ -162,7 +165,7 @@
       </button>
       <button id="viewCart" class="relative group" title="View Cart">
         <svg xmlns="http://www.w3.org/2000/svg"
-             class="w-6 h-6 stroke-current text-black dark:text-white"
+             class="w-6 h-6"
              fill="none" stroke-width="2" viewBox="0 0 24 24">
           <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                 d="M3 3h2l.4 2M7 13h10l4-8H5.4
@@ -423,6 +426,8 @@
     const cartPanel = document.getElementById('cartPanel');
     const closeCartPanel = document.getElementById('closeCartPanel');
     const cartTableBody = document.getElementById('cartTableBody');
+    const clearCartBtn = document.getElementById('clearCart');
+    const checkoutBtn = document.getElementById('checkoutBtn');
 
     function renderCartTable() {
       cartTableBody.innerHTML = '';
@@ -467,6 +472,17 @@
       if (!cartPanel.contains(e.target) && !viewCartBtn.contains(e.target)) {
         cartPanel.classList.add('hidden');
       }
+    });
+
+    clearCartBtn?.addEventListener('click', () => {
+      cart = {};
+      localStorage.removeItem('cart');
+      renderCartTable();
+      updateCartDisplay();
+    });
+
+    checkoutBtn?.addEventListener('click', () => {
+      alert('Checkout is not implemented yet.');
     });
   });
 
@@ -733,6 +749,10 @@
       </thead>
       <tbody id="cartTableBody"></tbody>
     </table>
+    <div class="mt-4 flex justify-between">
+      <button id="clearCart" class="px-3 py-1 bg-red-500 text-white rounded text-sm">Clear Cart</button>
+      <button id="checkoutBtn" class="px-3 py-1 bg-brand text-white rounded text-sm">Checkout</button>
+    </div>
   </div>
 </div>
 
