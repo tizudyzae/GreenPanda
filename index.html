@@ -137,6 +137,26 @@
       color: white;
     }
 
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-2px); }
+      75% { transform: translateX(2px); }
+    }
+
+    .shake {
+      animation: shake 0.3s;
+    }
+
+    @keyframes bump {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .bump {
+      animation: bump 0.3s;
+    }
+
   </style>
 </head>
 <body class="overflow-x-hidden transition-colors duration-300">
@@ -579,19 +599,25 @@
 
   // Cart + Qty click handlers
   document.addEventListener('click', e => {
-    if (e.target.closest('.product-trolley')) {
-      const id = e.target.closest('.product-trolley').dataset.id;
+    const trolleyBtn = e.target.closest('.product-trolley');
+    if (trolleyBtn) {
+      const id = trolleyBtn.dataset.id;
       qtyMap[id] = (qtyMap[id] || 1) + 1;
       document.getElementById(`qty-${id}`).textContent = `x${qtyMap[id]}`;
+      trolleyBtn.classList.add('shake');
+      trolleyBtn.addEventListener('animationend', () => trolleyBtn.classList.remove('shake'), { once: true });
     }
 
-    if (e.target.closest('.product-add')) {
-      const id = e.target.closest('.product-add').dataset.id;
+    const addBtn = e.target.closest('.product-add');
+    if (addBtn) {
+      const id = addBtn.dataset.id;
       cart[id] = (cart[id] || 0) + (qtyMap[id] || 1);
       localStorage.setItem('cart', JSON.stringify(cart));
       qtyMap[id] = 1;
       document.getElementById(`qty-${id}`).textContent = `x1`;
       updateCartDisplay();
+      addBtn.classList.add('bump');
+      addBtn.addEventListener('animationend', () => addBtn.classList.remove('bump'), { once: true });
     }
   });
 
