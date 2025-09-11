@@ -160,7 +160,7 @@
       <button id="toggleTheme" class="w-8 h-8" title="Toggle Theme">
         <span id="iconContainer" class="block"></span>
       </button>
-      <button class="relative group" title="View Cart">
+      <button id="viewCart" class="relative group" title="View Cart">
         <svg xmlns="http://www.w3.org/2000/svg"
              class="w-6 h-6 stroke-current text-black dark:text-white"
              fill="none" stroke-width="2" viewBox="0 0 24 24">
@@ -278,6 +278,7 @@
   let selectedProduct = null;
   let panelQuantity = 1;
   const qtyMap = {};
+  let allProducts = [];
 
   const categoryLinks = document.querySelectorAll('#categoryNav a');
   const sections = document.querySelectorAll('main section');
@@ -417,20 +418,28 @@
     updateCartDisplay();
   });
   
+  const viewCartBtn = document.getElementById('viewCart');
   const cartPanel = document.getElementById('cartPanel');
-const closeCartPanel = document.getElementById('closeCartPanel');
-const cartTableBody = document.getElementById('cartTableBody');
+  const closeCartPanel = document.getElementById('closeCartPanel');
+  const cartTableBody = document.getElementById('cartTableBody');
 
-// Open cart on basket click
-document.querySelector('button[title="View Cart"]')?.addEventListener('click', () => {
-  renderCartTable();
-  cartPanel.classList.remove('translate-y-full');
-});
+  // Open cart on basket click
+  viewCartBtn?.addEventListener('click', () => {
+    renderCartTable();
+    cartPanel.classList.remove('hidden');
+  });
 
-// Close cart panel
-closeCartPanel?.addEventListener('click', () => {
-  cartPanel.classList.add('translate-y-full');
-});
+  // Close cart panel
+  closeCartPanel?.addEventListener('click', () => {
+    cartPanel.classList.add('hidden');
+  });
+
+  // Hide cart when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!cartPanel.contains(e.target) && !viewCartBtn.contains(e.target)) {
+      cartPanel.classList.add('hidden');
+    }
+  });
 
 // Render cart table
 function renderCartTable() {
@@ -708,8 +717,8 @@ function renderCartTable() {
   </div>
 </div>
 
-<!-- Cart Slide-Out Panel -->
-<div id="cartPanel" class="fixed bottom-0 left-0 w-full max-h-[60%] bg-white dark:bg-[#2a3b2f] shadow-lg z-50 transform translate-y-full transition-transform duration-300 ease-in-out overflow-y-auto">
+<!-- Cart Card -->
+<div id="cartPanel" class="hidden fixed top-[6.5rem] right-4 w-80 max-h-[60%] bg-white dark:bg-[#2a3b2f] shadow-lg rounded-lg z-50 overflow-y-auto">
   <div class="p-4 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center">
     <h3 class="text-lg font-bold text-accent-dark dark:text-white">Your Basket</h3>
     <button id="closeCartPanel" class="text-xl font-bold text-gray-700 dark:text-white">&times;</button>
