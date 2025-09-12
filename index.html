@@ -14,7 +14,24 @@
   }
 </script>
 
-	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+(function(){
+  var ua = navigator.userAgent;
+  var isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+  var versionMatch = ua.match(/Version\/(\d+)/);
+  var safariVersion = versionMatch ? parseInt(versionMatch[1], 10) : 999;
+  if (isSafari && safariVersion < 15) {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'tailwind-compat.css';
+    document.head.appendChild(link);
+  } else {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.tailwindcss.com';
+    document.head.appendChild(script);
+  }
+})();
+</script>
   <style>
   
   
