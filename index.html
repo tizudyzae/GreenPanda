@@ -195,6 +195,16 @@
       animation: bump 0.3s;
     }
 
+    /* Scale up text and layout for larger screens while adding outer padding */
+    @media (min-width: 768px) {
+      html { font-size: 112.5%; } /* ~18px base font */
+      body { padding: 1.5rem; }
+    }
+
+    @media (min-width: 1024px) {
+      html { font-size: 125%; } /* ~20px base font */
+      body { padding: 2rem; }
+    }
   </style>
 </head>
 <body class="overflow-x-hidden transition-colors duration-300">
