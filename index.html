@@ -151,6 +151,10 @@
       color: var(--accent-dark);
     }
 
+    .unit-text {
+      color: var(--text);
+    }
+
 
 #detailPanel {
   height: calc(var(--vh, 1vh) * 100);
@@ -421,7 +425,7 @@
         <img src="${product.image_urls}" alt="${product.title}" class="w-full h-auto mb-2 rounded cursor-pointer"/>
         <h3 class="font-semibold text-lg text-accent-dark">
   ${product.title}
-  ${product.size ? `<span class="text-gray-700 dark:text-white text-sm"> (${product.size})</span>` : ''}
+  ${product.size ? `<span class="unit-text text-sm"> (${product.size})</span>` : ''}
 </h3>
 
         <p class="text-sm text-gray-600 mb-1">${product.price}</p>
@@ -460,7 +464,7 @@
   // Title with size in price-style font
   let titleHTML = product.title;
   if (product.size) {
-    titleHTML += ` <span class="text-gray-700 dark:text-white text-lg">(${product.size})</span>`;
+    titleHTML += ` <span class="unit-text text-lg">(${product.size})</span>`;
   }
   detailTitle.innerHTML = titleHTML;
 
@@ -491,17 +495,28 @@
 }
 
 
-  closePanel.addEventListener('click', () => {
+  function hidePanel() {
     overlay.classList.add('hidden');
     panel.classList.add('translate-x-full');
     document.body.classList.remove('freeze-scroll');
-  });
+  }
 
-  overlay.addEventListener('click', () => {
-    overlay.classList.add('hidden');
-    panel.classList.add('translate-x-full');
-    document.body.classList.remove('freeze-scroll');
-  });
+  closePanel.addEventListener('click', hidePanel);
+  overlay.addEventListener('click', hidePanel);
+
+  let startX = 0;
+  panel.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      startX = e.touches[0].clientX;
+    }
+  }, { passive: true });
+
+  panel.addEventListener('touchend', (e) => {
+    const endX = e.changedTouches[0].clientX;
+    if (startX > 50 && endX - startX > 80) {
+      hidePanel();
+    }
+  }, { passive: true });
 
   panelTrolley.addEventListener('click', () => {
     panelQuantity++;
